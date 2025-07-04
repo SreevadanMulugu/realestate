@@ -1,0 +1,3 @@
+Flask>=2.0
+google-generativeai>=0.3 # Specify a version that's current or known to work
+# For Colab, we might add flask_ngrok if needed, but not for general requirements.

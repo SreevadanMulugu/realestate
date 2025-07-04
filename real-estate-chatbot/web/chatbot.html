@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        #header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #header img {
+            width: 80px; /* Adjust as needed */
+            height: auto;
+            margin-bottom: 10px;
+        }
+        #chat-container {
+            width: 90%;
+            max-width: 600px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 70vh; /* Adjusted height */
+        }
+        #chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-bottom: 1px solid #eee;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto; /* Aligns to the right */
+        }
+        .bot-message {
+            background-color: #e9e9eb;
+            color: #333;
+            align-self: flex-start;
+            margin-right: auto; /* Aligns to the left */
+        }
+        #input-area {
+            display: flex;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 1em;
+        }
+        #send-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+        .typing-indicator {
+            font-style: italic;
+            color: #aaa;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <!-- Placeholder for a logo if desired -->
+        <!-- <img src="path/to/your/logo.png" alt="Chatbot Logo"> -->
+        <h1>Real Estate AI Chatbot</h1>
+        <p>Ask me about properties, prices, locations, and nearby amenities!</p>
+    </div>
+
+    <div id="chat-container">
+        <div id="chat-box">
+            <!-- Chat messages will appear here -->
+            <div class="message bot-message">Hello! I'm your real estate assistant. How can I help you today?</div>
+        </div>
+        <div id="input-area">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        function addMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+
+            // Sanitize message to prevent XSS if it were to render HTML directly from bot
+            // For now, just using textContent which is safe.
+            messageDiv.textContent = message;
+
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+        }
+
+        function showTypingIndicator() {
+            let typingDiv = document.querySelector('.typing-indicator');
+            if (!typingDiv) {
+                typingDiv = document.createElement('div');
+                typingDiv.classList.add('message', 'bot-message', 'typing-indicator');
+                typingDiv.textContent = 'Bot is typing...';
+                chatBox.appendChild(typingDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        function removeTypingIndicator() {
+            const typingDiv = document.querySelector('.typing-indicator');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
+        }
+
+        async function sendMessage() {
+            const query = userInput.value.trim();
+            if (!query) return;
+
+            addMessage(query, 'user');
+            userInput.value = ''; // Clear input field
+            showTypingIndicator();
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query }),
+                });
+
+                removeTypingIndicator();
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    addMessage(`Error: ${errorData.error || response.statusText}`, 'bot');
+                    return;
+                }
+
+                const data = await response.json();
+                addMessage(data.response, 'bot');
+
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('Error sending message. Please check the console or try again later.', 'bot');
+                console.error('Chat error:', error);
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
