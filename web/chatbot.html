@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real Estate Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; }
+        #chatbox { width: 400px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #ccc; padding: 20px; }
+        #messages { height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 10px; margin-bottom: 10px; background: #fafafa; }
+        .user { color: #0074D9; }
+        .bot { color: #111; }
+        #input-form { display: flex; }
+        #input-form input { flex: 1; padding: 8px; }
+        #input-form button { padding: 8px 16px; }
+    </style>
+</head>
+<body>
+    <div id="chatbox">
+        <h2>Real Estate Chatbot</h2>
+        <div id="messages"></div>
+        <form id="input-form">
+            <input type="text" id="user-input" placeholder="Ask about properties..." required />
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script>
+        const form = document.getElementById('input-form');
+        const input = document.getElementById('user-input');
+        const messages = document.getElementById('messages');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const userMsg = input.value;
+            messages.innerHTML += `<div class='user'><b>You:</b> ${userMsg}</div>`;
+            input.value = '';
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `message=${encodeURIComponent(userMsg)}`
+            });
+            const data = await res.json();
+            messages.innerHTML += `<div class='bot'><b>Bot:</b> ${data.response}</div>`;
+            messages.scrollTop = messages.scrollHeight;
+        };
+    </script>
+</body>
+</html> 

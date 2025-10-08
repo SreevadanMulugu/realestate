@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate AI Assistant - Find Your Dream Home</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200') center/cover;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .search-section {
+            background: white;
+            padding: 40px 0;
+            margin-top: -50px;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+        }
+
+        .property-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .property-image {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .property-price {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .property-info {
+            padding: 20px;
+        }
+
+        .property-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+        }
+
+        .property-location {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .property-features {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .feature {
+            text-align: center;
+            color: #7f8c8d;
+        }
+
+        .feature i {
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .btn-view {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s ease;
+        }
+
+        .btn-view:hover {
+            background: #2980b9;
+            color: white;
+        }
+
+        .stats-section {
+            background: var(--light-bg);
+            padding: 60px 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-home text-primary"></i> RealEstate AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat"><i class="fas fa-comments"></i> AI Chat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin"><i class="fas fa-cog"></i> Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-4">Find Your Dream Home</h1>
+            <p class="lead mb-4">Discover the perfect property with our AI-powered real estate assistant</p>
+            <a href="#search" class="btn btn-light btn-lg px-4">Start Searching</a>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section id="search" class="search-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card border-0 shadow">
+                        <div class="card-body p-4">
+                            <h4 class="text-center mb-4">Search Properties</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Search by name, location, or type...">
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="propertyType" class="form-select">
+                                        <option value="">All Types</option>
+                                        <option value="Apartment">Apartment</option>
+                                        <option value="Villa">Villa</option>
+                                        <option value="House">House</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button id="searchBtn" class="btn btn-primary w-100">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Properties Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h2 class="fw-bold">Available Properties</h2>
+                    <p class="text-muted">Found {{ total_properties }} properties</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary active" data-sort="newest">Newest</button>
+                        <button type="button" class="btn btn-outline-primary" data-sort="price-low">Price Low</button>
+                        <button type="button" class="btn btn-outline-primary" data-sort="price-high">Price High</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="propertiesContainer" class="row">
+                {% for property in properties %}
+                <div class="col-lg-4 col-md-6 property-item" data-name="{{ property.name.lower() }}" data-type="{{ property.property_type.lower() }}" data-price="{{ property.price }}">
+                    <div class="property-card">
+                        <div class="property-image" style="background-image: url('{{ property.image_url }}')">
+                            <div class="property-price">{{ property.price }}</div>
+                        </div>
+                        <div class="property-info">
+                            <h5 class="property-title">{{ property.name }}</h5>
+                            <p class="property-location">
+                                <i class="fas fa-map-marker-alt text-primary"></i> {{ property.location }}
+                            </p>
+                            <p class="text-muted">{{ property.description[:100] }}...</p>
+                            <div class="property-features">
+                                <div class="feature">
+                                    <i class="fas fa-bed"></i><br>
+                                    <small>{{ property.bedrooms }} Beds</small>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-bath"></i><br>
+                                    <small>{{ property.bathrooms }} Baths</small>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-ruler-combined"></i><br>
+                                    <small>{{ property.area_sqft }} sqft</small>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <a href="/property/{{ property.id }}" class="btn-view">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div id="noResults" class="text-center py-5" style="display: none;">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4>No properties found</h4>
+                <p class="text-muted">Try adjusting your search criteria</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ total_properties }}</div>
+                        <h5>Properties Available</h5>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-number">24/7</div>
+                        <h5>AI Support</h5>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <h5>Real-time Updates</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Floating Chat Button -->
+    <button id="openChatBtn" style="position:fixed;bottom:30px;right:30px;z-index:1100;background:#3498db;color:white;border:none;border-radius:50%;width:60px;height:60px;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:2rem;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <!-- Right-Side Chat Panel -->
+    <div id="chatPanel" style="position:fixed;top:0;right:-420px;width:400px;height:100vh;background:white;box-shadow:-2px 0 16px rgba(0,0,0,0.15);z-index:1200;transition:right 0.3s cubic-bezier(.4,2,.6,1);display:flex;flex-direction:column;">
+        <div style="background:#3498db;color:white;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-weight:bold;font-size:1.1rem"><i class="fas fa-robot"></i> AI Chat Assistant</span>
+            <button id="closeChatBtn" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">&times;</button>
+        </div>
+        <iframe id="chatIframe" src="/chat" style="border:none;flex:1 1 0%;width:100%;height:100%;"></iframe>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // WebSocket connection for real-time updates
+        let ws = null;
+        
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws`);
+            
+            ws.onopen = function() {
+                console.log('WebSocket connected');
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                showNotification(data.message, 'success');
+                // Refresh properties if needed
+                if (data.type === 'property_added' || data.type === 'property_updated' || data.type === 'property_deleted') {
+                    setTimeout(() => location.reload(), 2000);
+                }
+            };
+            
+            ws.onclose = function() {
+                console.log('WebSocket disconnected');
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        // Search functionality
+        document.getElementById('searchBtn').addEventListener('click', performSearch);
+        document.getElementById('searchInput').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const propertyType = document.getElementById('propertyType').value.toLowerCase();
+            const properties = document.querySelectorAll('.property-item');
+            let visibleCount = 0;
+
+            properties.forEach(property => {
+                const name = property.dataset.name;
+                const type = property.dataset.type;
+                const matchesSearch = name.includes(searchTerm) || property.querySelector('.property-location').textContent.toLowerCase().includes(searchTerm);
+                const matchesType = !propertyType || type === propertyType;
+
+                if (matchesSearch && matchesType) {
+                    property.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    property.style.display = 'none';
+                }
+            });
+
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        // Sorting functionality
+        document.querySelectorAll('[data-sort]').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('[data-sort]').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                const sortType = this.dataset.sort;
+                const properties = Array.from(document.querySelectorAll('.property-item'));
+                
+                properties.sort((a, b) => {
+                    if (sortType === 'newest') {
+                        return 0; // Already sorted by newest
+                    } else if (sortType === 'price-low') {
+                        return extractPrice(a.dataset.price) - extractPrice(b.dataset.price);
+                    } else if (sortType === 'price-high') {
+                        return extractPrice(b.dataset.price) - extractPrice(a.dataset.price);
+                    }
+                });
+                
+                const container = document.getElementById('propertiesContainer');
+                properties.forEach(property => container.appendChild(property));
+            });
+        });
+
+        function extractPrice(priceStr) {
+            const match = priceStr.match(/₹\s*(\d+(?:\.\d+)?)/);
+            return match ? parseFloat(match[1]) : 0;
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification show ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Floating Chat Panel Logic
+        const openChatBtn = document.getElementById('openChatBtn');
+        const closeChatBtn = document.getElementById('closeChatBtn');
+        const chatPanel = document.getElementById('chatPanel');
+        openChatBtn.onclick = () => {
+            chatPanel.style.right = '0';
+        };
+        closeChatBtn.onclick = () => {
+            chatPanel.style.right = '-420px';
+        };
+
+        // Initialize
+        connectWebSocket();
+    </script>
+</body>
+</html> 

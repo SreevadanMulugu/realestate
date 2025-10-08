@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+google-generativeai
+requests
+jinja2 
+websockets
+aiofiles
+python-multipart
+beautifulsoup4
+duckduckgo-search
+asyncio
+sqlite3 

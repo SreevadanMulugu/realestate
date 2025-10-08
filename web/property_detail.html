@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ property.name }} - Real Estate AI Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --dark-text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .property-hero {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('{{ property.image_url }}') center/cover;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            color: white;
+            position: relative;
+        }
+
+        .property-price-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .property-details {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .amenity-item {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .amenity-item i {
+            color: var(--secondary-color);
+            margin-right: 10px;
+        }
+
+        .contact-card {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .btn-contact {
+            background: white;
+            color: var(--secondary-color);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-contact:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .market-info {
+            background: var(--light-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-home text-primary"></i> RealEstate AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat"><i class="fas fa-comments"></i> AI Chat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin"><i class="fas fa-cog"></i> Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Property Hero Section -->
+    <section class="property-hero">
+        <div class="container">
+            <div class="property-price-badge">{{ property.price }}</div>
+            <div class="row">
+                <div class="col-md-8">
+                    <h1 class="display-4 fw-bold">{{ property.name }}</h1>
+                    <p class="lead">
+                        <i class="fas fa-map-marker-alt"></i> {{ property.location }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Property Details -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <div class="property-details p-4">
+                        <h3 class="mb-4">Property Details</h3>
+                        <p class="text-muted mb-4">{{ property.description }}</p>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="fas fa-bed"></i>
+                                    </div>
+                                    <h5>{{ property.bedrooms }}</h5>
+                                    <small class="text-muted">Bedrooms</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="fas fa-bath"></i>
+                                    </div>
+                                    <h5>{{ property.bathrooms }}</h5>
+                                    <small class="text-muted">Bathrooms</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="fas fa-ruler-combined"></i>
+                                    </div>
+                                    <h5>{{ property.area_sqft }}</h5>
+                                    <small class="text-muted">Sq Ft</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="feature-icon mx-auto">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <h5>{{ property.property_type }}</h5>
+                                    <small class="text-muted">Type</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Nearby Landmarks -->
+                        <h4 class="mb-3">Nearby Landmarks</h4>
+                        <div id="landmarksContainer">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading nearby landmarks...</p>
+                            </div>
+                        </div>
+
+                        <!-- Market Information -->
+                        <h4 class="mb-3 mt-4">Market Information</h4>
+                        <div id="marketContainer">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading market data...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Contact Information -->
+                    <div class="contact-card mb-4">
+                        <h4 class="mb-3">Contact Information</h4>
+                        <p><i class="fas fa-phone"></i> {{ property.contact_info }}</p>
+                        <p><i class="fas fa-envelope"></i> info@realestateai.com</p>
+                        <button class="btn-contact w-100 mb-2">
+                            <i class="fas fa-phone"></i> Call Now
+                        </button>
+                        <button class="btn-contact w-100">
+                            <i class="fas fa-envelope"></i> Send Message
+                        </button>
+                    </div>
+
+                    <!-- Property Features -->
+                    <div class="feature-card">
+                        <h5 class="mb-3">Property Features</h5>
+                        <div class="amenity-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ property.bedrooms }} Bedrooms</span>
+                        </div>
+                        <div class="amenity-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ property.bathrooms }} Bathrooms</span>
+                        </div>
+                        <div class="amenity-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ property.area_sqft }} Square Feet</span>
+                        </div>
+                        <div class="amenity-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ property.property_type }} Type</span>
+                        </div>
+                        <div class="amenity-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Modern Amenities</span>
+                        </div>
+                        <div class="amenity-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>24/7 Security</span>
+                        </div>
+                    </div>
+
+                    <!-- Similar Properties -->
+                    <div class="feature-card">
+                        <h5 class="mb-3">Similar Properties</h5>
+                        <div id="similarProperties">
+                            <div class="loading">
+                                <div class="spinner"></div>
+                                <p>Loading similar properties...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Inject property data as JS variables
+        const PROPERTY_ID = {{ property.id }};
+        const PROPERTY_TYPE = "{{ property.property_type }}";
+        // Floating Chat Panel Logic
+        const openChatBtn = document.createElement('button');
+        openChatBtn.id = 'openChatBtn';
+        openChatBtn.innerHTML = '<i class="fas fa-comments"></i>';
+        openChatBtn.style = 'position:fixed;bottom:30px;right:30px;z-index:1100;background:#3498db;color:white;border:none;border-radius:50%;width:60px;height:60px;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:2rem;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+        document.body.appendChild(openChatBtn);
+
+        const chatPanel = document.createElement('div');
+        chatPanel.id = 'chatPanel';
+        chatPanel.style = 'position:fixed;top:0;right:-420px;width:400px;height:100vh;background:white;box-shadow:-2px 0 16px rgba(0,0,0,0.15);z-index:1200;transition:right 0.3s cubic-bezier(.4,2,.6,1);display:flex;flex-direction:column;';
+        chatPanel.innerHTML = `
+            <div style="background:#3498db;color:white;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-weight:bold;font-size:1.1rem"><i class="fas fa-robot"></i> AI Chat Assistant</span>
+                <button id="closeChatBtn" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">&times;</button>
+            </div>
+            <iframe id="chatIframe" src="/chat?property_id=${PROPERTY_ID}" style="border:none;flex:1 1 0%;width:100%;height:100%;"></iframe>
+        `;
+        document.body.appendChild(chatPanel);
+        openChatBtn.onclick = () => {
+            chatPanel.style.right = '0';
+        };
+        chatPanel.querySelector('#closeChatBtn').onclick = () => {
+            chatPanel.style.right = '-420px';
+        };
+
+        // WebSocket for real-time property updates
+        let ws = null;
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws`);
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === 'property_updated' || data.type === 'property_deleted') {
+                    if (window.location.pathname.includes('/property/' + PROPERTY_ID)) {
+                        showToast('This property was updated. Refreshing...');
+                        setTimeout(() => window.location.reload(), 1500);
+                    }
+                }
+            };
+            ws.onclose = function() {
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+        function showToast(msg) {
+            let toast = document.createElement('div');
+            toast.textContent = msg;
+            toast.style = 'position:fixed;top:30px;right:30px;background:#27ae60;color:white;padding:15px 25px;border-radius:10px;z-index:2000;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-size:1.1rem;';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+        connectWebSocket();
+
+        // Existing property detail JS
+        async function loadLandmarks() {
+            try {
+                const response = await fetch(`/api/amenities/{{ property.location }}`);
+                const data = await response.json();
+                if (data.success) {
+                    const landmarks = data.data.amenities;
+                    let landmarksHtml = '';
+                    for (const [type, info] of Object.entries(landmarks)) {
+                        if (info.summary && info.summary !== 'Information not available') {
+                            landmarksHtml += `
+                                <div class="amenity-item">
+                                    <i class="fas fa-${getAmenityIcon(type)}"></i>
+                                    <div>
+                                        <strong>${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                                        <br><small class="text-muted">${info.summary.substring(0, 100)}...</small>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                    if (landmarksHtml) {
+                        document.getElementById('landmarksContainer').innerHTML = landmarksHtml;
+                    } else {
+                        document.getElementById('landmarksContainer').innerHTML = '<p class="text-muted">No nearby landmarks information available.</p>';
+                    }
+                }
+            } catch (error) {
+                document.getElementById('landmarksContainer').innerHTML = '<p class="text-muted">Unable to load nearby landmarks.</p>';
+            }
+        }
+        async function loadMarketInfo() {
+            try {
+                const response = await fetch(`/api/market-info/{{ property.location }}`);
+                const data = await response.json();
+                if (data.success && data.data.summary) {
+                    document.getElementById('marketContainer').innerHTML = `
+                        <div class="market-info">
+                            <h6>Market Overview</h6>
+                            <p>${data.data.summary}</p>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('marketContainer').innerHTML = '<p class="text-muted">Market information not available.</p>';
+                }
+            } catch (error) {
+                document.getElementById('marketContainer').innerHTML = '<p class="text-muted">Unable to load market information.</p>';
+            }
+        }
+        async function loadSimilarProperties() {
+            try {
+                const response = await fetch('/api/properties');
+                const data = await response.json();
+                if (data.success) {
+                    const similarProperties = data.data
+                        .filter(p => p.id !== PROPERTY_ID && p.property_type === PROPERTY_TYPE)
+                        .slice(0, 3);
+                    if (similarProperties.length > 0) {
+                        let html = '';
+                        similarProperties.forEach(property => {
+                            html += `
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="${property.image_url}" alt="${property.name}" 
+                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
+                                    <div>
+                                        <h6 class="mb-1">${property.name}</h6>
+                                        <p class="text-muted mb-1">${property.price}</p>
+                                        <small class="text-muted">${property.location}</small>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        document.getElementById('similarProperties').innerHTML = html;
+                    } else {
+                        document.getElementById('similarProperties').innerHTML = '<p class="text-muted">No similar properties found.</p>';
+                    }
+                }
+            } catch (error) {
+                document.getElementById('similarProperties').innerHTML = '<p class="text-muted">Unable to load similar properties.</p>';
+            }
+        }
+        function getAmenityIcon(type) {
+            const icons = {
+                'schools': 'graduation-cap',
+                'hospitals': 'hospital',
+                'shopping centers': 'shopping-cart',
+                'restaurants': 'utensils',
+                'parks': 'tree'
+            };
+            return icons[type] || 'map-marker-alt';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLandmarks();
+            loadMarketInfo();
+            loadSimilarProperties();
+        });
+    </script>
+</body>
+</html> 
